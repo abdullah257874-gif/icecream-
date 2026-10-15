@@ -1,0 +1,99 @@
+import { Star } from 'lucide-react';
+import { featuredProducts } from '../data/products';
+
+const FlavorSection = ({ onAddToCart, addToast }) => {
+  const handleCardMove = (e) => {
+    const el = e.currentTarget;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const px = (x / rect.width) - 0.5;
+    const py = (y / rect.height) - 0.5;
+    const rotY = px * 8;
+    const rotX = -py * 8;
+    el.style.transform = `perspective(900px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(6px)`;
+    el.style.transition = 'transform 120ms linear';
+  };
+
+  const handleCardLeave = (e) => {
+    const el = e.currentTarget;
+    el.style.transform = '';
+    el.style.transition = 'transform 400ms cubic-bezier(.2,.9,.3,1)';
+  };
+
+  const handleAdd = (product) => {
+    onAddToCart(product);
+    if (addToast) addToast(`${product.name} added to cart`);
+  };
+
+  return (
+    <section id="flavors" className="section-shell">
+      <div className="mb-10 text-center">
+        <span className="tag">Featured Flavors</span>
+        <h2 className="mt-4 text-3xl font-extrabold text-brown sm:text-4xl">
+          Dreamy Sips, Sweet Swirls
+        </h2>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        {featuredProducts.map((product) => (
+          <article
+            key={product.id}
+            className="product-card soft-card overflow-hidden bg-white transform-gpu will-change-transform"
+            onMouseMove={handleCardMove}
+            onMouseLeave={handleCardLeave}
+            role="group"
+          >
+            <div className="overflow-hidden">
+              <img
+                src={product.image}
+                alt={product.name}
+                className="h-72 w-full object-cover transition duration-700 group-hover:scale-105"
+                loading="lazy"
+              />
+            </div>
+
+            <div className="p-6">
+              <div className="mb-3 flex items-center justify-between">
+                <span className="rounded-full bg-[#FFF0F4] px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-brown/80">
+                  {product.tag}
+                </span>
+                <div className="flex items-center gap-1 text-[#F6C453]">
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <Star
+                      key={index}
+                      size={14}
+                      fill={index < product.rating ? 'currentColor' : 'none'}
+                      strokeWidth={1.5}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <h3 className="text-2xl font-bold text-brown">{product.name}</h3>
+              <p className="mt-3 text-sm leading-6 text-brown/70">
+                {product.description}
+              </p>
+
+              <div className="mt-5 flex items-center justify-between">
+                <span className="text-2xl font-extrabold text-brown">
+                  ${product.price.toFixed(2)}
+                </span>
+
+                <button
+                  type="button"
+                  onClick={() => handleAdd(product)}
+                  className="btn-primary py-2.5 text-sm"
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+};
+
+export default FlavorSection;
