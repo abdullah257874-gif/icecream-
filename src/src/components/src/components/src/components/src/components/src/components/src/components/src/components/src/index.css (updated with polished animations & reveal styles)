@@ -1,0 +1,215 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Poppins', sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  color: #59382b;
+  background: #fff8e7;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: #fff8e7;
+  color: #59382b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+@layer components {
+  .section-shell {
+    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-full bg-pink px-6 py-3 font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:shadow-lg;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-full border border-brown/20 bg-white px-6 py-3 font-semibold text-brown transition duration-300 hover:-translate-y-0.5 hover:shadow-md;
+  }
+
+  .soft-card {
+    @apply rounded-[28px] border border-brown/5 bg-white shadow-soft;
+  }
+
+  .tag {
+    @apply inline-flex items-center rounded-full bg-[#FFF0F4] px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-brown/80;
+  }
+
+  .menu-link {
+    @apply relative text-sm font-medium text-brown/80 transition hover:text-pink;
+  }
+
+  .menu-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    height: 2px;
+    width: 0;
+    background: #ff8fab;
+    transition: width 0.3s ease;
+  }
+
+  .menu-link:hover::after {
+    width: 100%;
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.fade-up {
+  animation: fadeUp 0.7s ease both;
+}
+
+.float-slow {
+  animation: float 5s ease-in-out infinite;
+}
+
+.product-card:hover,
+.gallery-card:hover,
+.about-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 18px 40px rgba(89, 56, 43, 0.12);
+}
+
+.product-card,
+.gallery-card,
+.about-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Reveal wrapper */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 620ms cubic-bezier(.2,.9,.3,1), transform 620ms cubic-bezier(.2,.9,.3,1);
+}
+
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Toast animations */
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toastOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+
+.animate-toast-in {
+  animation: toastIn 320ms cubic-bezier(.2,.9,.3,1) both;
+}
+
+.animate-toast-out {
+  animation: toastOut 240ms cubic-bezier(.2,.9,.3,1) both;
+}
+
+/* Badge pop for cart */
+@keyframes pop {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.35); }
+  60% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.pop {
+  animation: pop 420ms cubic-bezier(.2,.9,.3,1);
+}
+
+/* Subtle focus outline for accessibility */
+:focus {
+  outline: none;
+}
+
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible {
+  box-shadow: 0 0 0 4px rgba(255, 143, 171, 0.18);
+  border-radius: 12px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
