@@ -1,0 +1,103 @@
+import { Minus, Plus, ShoppingCart, Trash2 } from 'lucide-react';
+import { useMemo, useState } from 'react';
+
+const emptyForm = {
+  name: '',
+  phone: '',
+  address: '',
+  notes: '',
+};
+
+const Cart = ({ items, total, onIncrease, onDecrease, onRemove, addToast }) => {
+  const [formData, setFormData] = useState(emptyForm);
+  const [errors, setErrors] = useState({});
+  const [submitted, setSubmitted] = useState(false);
+
+  const totalItems = useMemo(
+    () => items.reduce((sum, item) => sum + item.quantity, 0),
+    [items]
+  );
+
+  const validate = () => {
+    const nextErrors = {};
+
+    if (!formData.name.trim()) nextErrors.name = 'Name is required.';
+    if (!formData.phone.trim()) nextErrors.phone = 'Phone is required.';
+    if (!formData.address.trim()) nextErrors.address = 'Address is required.';
+
+    return nextErrors;
+  };
+
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({ ...prev, [field]: '' }));
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const nextErrors = validate();
+
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      setSubmitted(false);
+      return;
+    }
+
+    setSubmitted(true);
+    setErrors({});
+    setFormData(emptyForm);
+    if (addToast) addToast('Demo order submitted (not processed).');
+  };
+
+  return (
+    <aside className="soft-card bg-white p-6 sm:p-7">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#FFF1F5] text-pink">
+            <ShoppingCart size={20} />
+          </div>
+          <div>
+            <p className="text-sm uppercase tracking-[0.12em] text-brown/70">
+              Your Cart
+            </p>
+            <h3 className="text-2xl font-extrabold text-brown">
+              {totalItems} items
+            </h3>
+          </div>
+        </div>
+      </div>
+
+      {items.length === 0 ? (
+        <div className="mt-8 rounded-[22px] border border-dashed border-brown/20 bg-[#FFF9F3] p-8 text-center">
+          <p className="text-xl font-bold text-brown">Your cart is empty.</p>
+          <p className="mt-2 text-sm text-brown/70">
+            Add a sweet treat to get started.
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="mt-6 space-y-4">
+            {items.map((item) => (
+              <div
+                key={item.id}
+                className="flex gap-3 rounded-[20px] border border-brown/10 bg-[#FFFDF9] p-3"
+              >
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="h-20 w-20 rounded-2xl object-cover"
+                />
+
+                <div className="flex w-full flex-col justify-between">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-base font-bold text-brown">{item.name}</p>
+                      <p className="text-sm text-brown/70">
+                        ${(Number(item.price) * Number(item.quantity)).toFixed(2)}
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="text-brown/60 transition hover:text-pink"
+                      onClick={() => { onRemove(item.id); if (addToast) addToast(`${item.name} removed
