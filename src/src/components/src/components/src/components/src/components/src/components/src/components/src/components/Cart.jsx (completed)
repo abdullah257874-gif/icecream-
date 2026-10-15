@@ -1,0 +1,250 @@
+import { Minus, Plus, ShoppingCart, Trash2 } from 'lucide-react';
+import { useMemo, useState } from 'react';
+
+const emptyForm = {
+  name: '',
+  phone: '',
+  address: '',
+  notes: '',
+};
+
+const Cart = ({ items, total, onIncrease, onDecrease, onRemove, addToast }) => {
+  const [formData, setFormData] = useState(emptyForm);
+  const [errors, setErrors] = useState({});
+  const [submitted, setSubmitted] = useState(false);
+
+  const totalItems = useMemo(
+    () => items.reduce((sum, item) => sum + item.quantity, 0),
+    [items]
+  );
+
+  const validate = () => {
+    const nextErrors = {};
+
+    if (!formData.name.trim()) nextErrors.name = 'Name is required.';
+    if (!formData.phone.trim()) nextErrors.phone = 'Phone is required.';
+    if (!formData.address.trim()) nextErrors.address = 'Address is required.';
+
+    return nextErrors;
+  };
+
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({ ...prev, [field]: '' }));
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const nextErrors = validate();
+
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      setSubmitted(false);
+      return;
+    }
+
+    setSubmitted(true);
+    setErrors({});
+    setFormData(emptyForm);
+    if (addToast) addToast('Demo order submitted (not processed).');
+  };
+
+  const handleRemove = (item) => {
+    onRemove(item.id);
+    if (addToast) addToast(`${item.name} removed`);
+  };
+
+  const handleDecrease = (item) => {
+    onDecrease(item.id);
+    if (addToast) addToast(`Updated ${item.name}`);
+  };
+
+  const handleIncrease = (item) => {
+    onIncrease(item.id);
+    if (addToast) addToast(`Updated ${item.name}`);
+  };
+
+  return (
+    <aside className="soft-card bg-white p-6 sm:p-7">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#FFF1F5] text-pink">
+            <ShoppingCart size={20} />
+          </div>
+          <div>
+            <p className="text-sm uppercase tracking-[0.12em] text-brown/70">
+              Your Cart
+            </p>
+            <h3 className="text-2xl font-extrabold text-brown">
+              {totalItems} items
+            </h3>
+          </div>
+        </div>
+      </div>
+
+      {items.length === 0 ? (
+        <div className="mt-8 rounded-[22px] border border-dashed border-brown/20 bg-[#FFF9F3] p-8 text-center">
+          <p className="text-xl font-bold text-brown">Your cart is empty.</p>
+          <p className="mt-2 text-sm text-brown/70">
+            Add a sweet treat to get started.
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="mt-6 space-y-4">
+            {items.map((item) => (
+              <div
+                key={item.id}
+                className="flex gap-3 rounded-[20px] border border-brown/10 bg-[#FFFDF9] p-3"
+              >
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="h-20 w-20 rounded-2xl object-cover"
+                />
+
+                <div className="flex w-full flex-col justify-between">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-base font-bold text-brown">{item.name}</p>
+                      <p className="text-sm text-brown/70">
+                        ${(Number(item.price) * Number(item.quantity)).toFixed(2)}
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="text-brown/60 transition hover:text-pink"
+                      onClick={() => handleRemove(item)}
+                      aria-label={`Remove ${item.name}`}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+
+                  <div className="mt-3 flex items-center justify-between">
+                    <div className="flex items-center rounded-full border border-brown/10 bg-white">
+                      <button
+                        type="button"
+                        onClick={() => handleDecrease(item)}
+                        className="flex h-8 w-8 items-center justify-center text-brown transition hover:text-pink"
+                        aria-label={`Decrease quantity of ${item.name}`}
+                      >
+                        <Minus size={14} />
+                      </button>
+                      <span className="min-w-[32px] text-center text-sm font-semibold">
+                        {item.quantity}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleIncrease(item)}
+                        className="flex h-8 w-8 items-center justify-center text-brown transition hover:text-pink"
+                        aria-label={`Increase quantity of ${item.name}`}
+                      >
+                        <Plus size={14} />
+                      </button>
+                    </div>
+
+                    <span className="text-sm font-semibold text-brown">
+                      ${(Number(item.price) * Number(item.quantity)).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-6 rounded-[22px] bg-[#FFF9EC] p-4">
+            <div className="flex items-center justify-between text-brown">
+              <span className="text-base font-medium">Subtotal</span>
+              <span className="text-xl font-extrabold">
+                ${Number(total).toFixed(2)}
+              </span>
+            </div>
+            <p className="mt-2 text-xs text-brown/70">
+              Demo checkout only — no real orders or payments are processed.
+            </p>
+          </div>
+
+          <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+            <div>
+              <label className="mb-1 block text-sm font-semibold text-brown">
+                Name
+              </label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                className="w-full rounded-xl border border-brown/10 bg-[#FFFDFB] px-4 py-3 outline-none transition focus:border-pink"
+                placeholder="Your name"
+              />
+              {errors.name && (
+                <p className="mt-1 text-xs text-red-500">{errors.name}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-semibold text-brown">
+                Phone
+              </label>
+              <input
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => handleInputChange('phone', e.target.value)}
+                className="w-full rounded-xl border border-brown/10 bg-[#FFFDFB] px-4 py-3 outline-none transition focus:border-pink"
+                placeholder="Your phone"
+              />
+              {errors.phone && (
+                <p className="mt-1 text-xs text-red-500">{errors.phone}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-semibold text-brown">
+                Address
+              </label>
+              <textarea
+                value={formData.address}
+                onChange={(e) => handleInputChange('address', e.target.value)}
+                rows={3}
+                className="w-full rounded-xl border border-brown/10 bg-[#FFFDFB] px-4 py-3 outline-none transition focus:border-pink"
+                placeholder="Your delivery address"
+              />
+              {errors.address && (
+                <p className="mt-1 text-xs text-red-500">{errors.address}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-semibold text-brown">
+                Order Notes
+              </label>
+              <textarea
+                value={formData.notes}
+                onChange={(e) => handleInputChange('notes', e.target.value)}
+                rows={2}
+                className="w-full rounded-xl border border-brown/10 bg-[#FFFDFB] px-4 py-3 outline-none transition focus:border-pink"
+                placeholder="Extra details..."
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="inline-flex w-full items-center justify-center rounded-full bg-brown px-6 py-3 font-semibold text-white transition hover:bg-[#482d23]"
+            >
+              Place Demo Order
+            </button>
+
+            {submitted && (
+              <p className="rounded-xl bg-[#EAFAF1] px-4 py-3 text-sm font-medium text-[#1B6B49]">
+                Demo order submitted successfully. Connect a real backend and payment provider for production use.
+              </p>
+            )}
+          </form>
+        </>
+      )}
+    </aside>
+  );
+};
+
+export default Cart;
