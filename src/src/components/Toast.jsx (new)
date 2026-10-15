@@ -1,0 +1,40 @@
+import { useEffect, useRef } from 'react';
+
+/**
+ * Wrap sections with <Reveal> to trigger the 'revealed' class when they enter the viewport.
+ * This enables fade-up + subtle motion. Honors prefers-reduced-motion.
+ */
+
+const Reveal = ({ children, rootMargin = '-10% 0px -10% 0px' }) => {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.classList.add('revealed');
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { root: null, rootMargin, threshold: 0.12 }
+    );
+
+    observer.observe(el);
+
+    return () => observer.disconnect();
+  }, [rootMargin]);
+
+  return <div ref={ref} className="reveal">{children}</div>;
+};
+
+export default Reveal;
