@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Poppins:wght@400;600;700&display=swap');
+
+:root {
+  --bg: #FFF8E7;
+  --strawberry: #FF8FAB;
+  --chocolate: #59382B;
+  --mint: #B8E6D0;
+  --lavender: #DCD6F7;
+  --white: #FFFFFF;
+}
+
+/* Tailwind base */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+body {
+  font-family: 'Poppins', 'Nunito', sans-serif;
+  background-color: var(--bg);
+  color: var(--chocolate);
+}
+
+/* Fade in */
+.fade-in {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeIn 0.9s forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .fade-in {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Rounded product images */
+.product-img {
+  object-fit: cover;
+}
+
+/* Modal/cart drawer */
+.cart-drawer {
+  transition: transform 0.25s ease;
+}
+
+/* Tiny utility for subtle floating shapes */
+.float-slow {
+  animation: float 6s ease-in-out infinite;
+}
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
