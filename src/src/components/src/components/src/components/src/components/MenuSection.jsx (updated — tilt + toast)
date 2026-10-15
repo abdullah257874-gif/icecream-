@@ -1,0 +1,111 @@
+import { useMemo, useState } from 'react';
+import { ShoppingBag } from 'lucide-react';
+import { menuItems } from '../data/products';
+
+const categories = ['All Flavors', 'Fruit', 'Chocolate', 'Classic', 'Special Desserts'];
+
+const MenuSection = ({ onAddToCart, addToast }) => {
+  const [activeCategory, setActiveCategory] = useState('All Flavors');
+
+  const filteredItems = useMemo(() => {
+    if (activeCategory === 'All Flavors') return menuItems;
+    return menuItems.filter((item) => item.category === activeCategory);
+  }, [activeCategory]);
+
+  const handleCardMove = (e) => {
+    const el = e.currentTarget;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const px = (x / rect.width) - 0.5;
+    const py = (y / rect.height) - 0.5;
+    const rotY = px * 6;
+    const rotX = -py * 6;
+    el.style.transform = `perspective(900px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(4px)`;
+    el.style.transition = 'transform 120ms linear';
+  };
+
+  const handleCardLeave = (e) => {
+    const el = e.currentTarget;
+    el.style.transform = '';
+    el.style.transition = 'transform 420ms cubic-bezier(.2,.9,.3,1)';
+  };
+
+  const handleAdd = (item) => {
+    onAddToCart(item);
+    if (addToast) addToast(`${item.name} added to cart`);
+  };
+
+  return (
+    <section id="menu" className="section-shell">
+      <div className="mb-10 text-center">
+        <span className="tag">Menu</span>
+        <h2 className="mt-4 text-3xl font-extrabold text-brown sm:text-4xl">
+          Pick Your Favorite Treat
+        </h2>
+      </div>
+
+      <div className="mb-8 flex flex-wrap justify-center gap-3">
+        {categories.map((category) => (
+          <button
+            key={category}
+            type="button"
+            className={`rounded-full px-5 py-2.5 text-sm font-semibold transition ${
+              activeCategory === category
+                ? 'bg-pink text-white shadow-soft'
+                : 'bg-white text-brown/80 hover:bg-[#FFF1F5]'
+            }`}
+            onClick={() => setActiveCategory(category)}
+          >
+            {category}
+          </button>
+        ))}
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        {filteredItems.map((item) => (
+          <article
+            key={item.id}
+            className="soft-card overflow-hidden bg-white transform-gpu will-change-transform"
+            onMouseMove={handleCardMove}
+            onMouseLeave={handleCardLeave}
+          >
+            <img
+              src={item.image}
+              alt={item.name}
+              className="h-56 w-full object-cover transition duration-700 group-hover:scale-105"
+              loading="lazy"
+            />
+
+            <div className="p-5">
+              <div className="flex items-center justify-between">
+                <span className="rounded-full bg-[#FFF0F4] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-brown/80">
+                  {item.category}
+                </span>
+                <span className="text-lg font-extrabold text-brown">
+                  ${item.price.toFixed(2)}
+                </span>
+              </div>
+
+              <h3 className="mt-4 text-xl font-bold text-brown">{item.name}</h3>
+              <p className="mt-2 text-sm leading-6 text-brown/70">
+                {item.description}
+              </p>
+
+              <button
+                type="button"
+                onClick={() => handleAdd(item)}
+                className="mt-5 inline-flex items-center gap-2 rounded-full bg-brown px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#482d23]"
+              >
+                <ShoppingBag size={16} />
+                Add to Cart
+              </button>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+};
+
+export default MenuSection;
